@@ -161,7 +161,7 @@ export default App
 
 let's de-structure the 'category' parameter inside map function from
 
-(category) to ({title})
+(category) to ({title, id})
 
 and just put this title inside h2 like this
 
@@ -199,8 +199,8 @@ function App() {
 
   return (
   <div className="categories-container">
-   {categories.map(({title}) => (
-    <div className='category-container'>
+   {categories.map(({title, id}) => (
+    <div key={id} className='category-container'>
      {/* <img/> */}
        <div className='category-body-container'>
          <h2>{title}</h2>
@@ -224,3 +224,50 @@ export default App
 3. Styling with SASS or Sassy CSS
 
 sass is more efficient way of writing CSS
+
+why SASS is better than CSS
+because its very intuitive when you reading it, you don't need to mention child-parent class for element in the hierarchy
+
+for example:
+
+### with Css
+
+```
+.categories-container{
+  background-color: red;
+  padding: 10px;
+}
+.categories-container .category-container {
+  background-color: green;
+  padding: 20px;
+}
+.categories-container .category-container .category-body-container {
+  background-color: blue;
+  padding: 30px;
+    }
+```
+
+### with Sass
+```
+.categories-container{
+ background-color: red;
+ padding: 10px;
+
+  .category-container {
+    background-color: green;
+    padding: 20px;
+
+     .category-body-container {
+       background-color: blue;
+       padding: 30px;
+    }
+  }  
+}
+```
+
+
+install SASS
+
+> npm install sass
+
+lets create a new scss file named 'categories.styles.scss'
