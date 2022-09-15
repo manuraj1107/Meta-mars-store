@@ -94,10 +94,10 @@ So We can say the category-container structure is same for all five container an
 
 So let's optimize it
 
-# instead of hard-coding out these four other containers-section, what we can do is initialize some variable Array
+### instead of hard-coding out these four other containers-section, what we can do is initialize some variable Array
 
-# let's say the variable name is 'categories' and this is gonna be an array which contain objects that reflects what we having here
+### let's say the variable name is 'categories' and this is gonna be an array which contain objects that reflects what we having here
 
-# let's start with first object and decide how'll we shape it.
+### let's start with first object and decide how'll we shape it.
 
 
