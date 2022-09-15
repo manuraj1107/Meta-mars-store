@@ -28,7 +28,7 @@ Now copy whole categories-container  and paste it five times and change its #h2 
 
 it will look like this
 
-<!-- <div className="categories-container">
+``` <div className="categories-container">
     <div className='category-container'>
      {/* <img/> */}
      <div className='category-body-container'>
@@ -36,7 +36,8 @@ it will look like this
       <p>Shop Now</p>
      </div>
     </div>
-   </div> -->
+   </div> 
+   ```
 
 
  2. After building the structure we gonna apply some basic styling  
@@ -44,7 +45,8 @@ and abstracting the work we need to do.
 
 As you can see in the code that all five components are duplicated five times
 
-<!-- <div className="categories-container">
+``` 
+<div className="categories-container">
     <div className='category-container'>
      {/* <img/> */}
      <div className='category-body-container'>
@@ -80,7 +82,9 @@ As you can see in the code that all five components are duplicated five times
       <p>Shop Now</p>
      </div>
     </div>
-   </div> -->
+   </div>
+
+   ```
 
 We hard-coded it at first place because it was easier thing to do but but but as we scale it doesn't make any sense
 
