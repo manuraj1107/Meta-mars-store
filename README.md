@@ -163,7 +163,7 @@ let's de-structure the 'category' parameter inside map function from
 
 (category) to ({title})
 
-and just put this title inside <h2> like this
+and just put this title inside h2 like this
 
 ```
 <h2> {title}</h2>
