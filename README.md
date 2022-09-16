@@ -400,5 +400,98 @@ and change the jsx like this
          <h2>{title}</h2>
          <p>Shop Now</p>
        </div>
+))}
+
 ```
 
+What we wanna do now is realy just start moving what is inappropriate
+that means one file to its own separate components
+
+for that we gonna create 'components' folder inside 'src' folder
+and then create another folder inside src/components/category-items
+
+Now add two new files inside src/components/category-items
+
+> category-item.component.jsx
+> category-item.styles.scss
+
+in category-item.component.jsx we create functional component "CategoryItem"
+here we gona recieve the entire object as a prop {category}
+
+and in return we write or copy-paste all the JSX of category-item from App.jsx
+
+```
+import './category-item.styles.scss'
+
+const CategoryItem = ({category}) => {
+
+    return (
+        <div key={id} className='category-container'>
+     <div className='background-image' style={{
+      backgroundImage: `url(${imageUrl})`
+     }} />
+       <div className='category-body-container'>
+         <h2>{title}</h2>
+         <p>Shop Now</p>
+       </div>
+    </div>
+    )
+
+}
+
+export default CategoryItem
+```
+
+Now remember, we cannot use the 'ID' key here! Why?
+> we need to put it to the place where we'll actually caal the map 
+
+but we know we need the image URL, here we can destructure imgaeURL and title or we can directly put it to prop , its yoyr choice
+
+```
+const {imageUrl, title} = category;
+```
+
+well we pretty much converted this over to its own component
+
+
+Now come to App.jsx and import CategoryItem
+
+```
+import CategoryItem from './components/category-items/category-item.component'
+```
+
+and paste the <CategoryItem /> component inside the map
+
+now we know that we need to actualy pass the entire category
+
+```
+<CategoryItem key={category.id} category={category} />
+```
+
+so the complete code will look like
+
+> App.jsx
+```
+import CategoryItem from './components/category-items/category-item.component'
+import './categories.styles.scss'
+
+
+function App() {
+  const categories = [...!]
+  
+  return (
+  <div className="categories-container">
+   {categories.map((category) => (
+      <CategoryItem key={category.id} category={category} />
+   ))}
+
+    
+  </div>
+  )
+}
+
+export default App
+
+```
+
+Now we can't put this category component in App.jsx , we need create a diectory component for categories
