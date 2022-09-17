@@ -517,3 +517,159 @@ and the link in 'index.html'
 <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@100;300;400;600;700&display=swap" rel="stylesheet">
 ```
 
+
+## Routing and React-Router
+
+### Routing
+
+<p>Install react router</p>
+
+> npm install react-router-dom@6
+
+now for the routing, we need to need to wrap this application inside  router component
+
+to do so, we need to do first import <b>BrowserRouter</b> component from react-router-dom
+
+```
+import { BrowserRouter } from 'react-router-dom';
+```
+if you are wondering why there is a <b>BrowserRouter</b>, actually BrowserRouter is a generic router, 
+It leverages the URL in order to keep track of the history of where the user is navigating through and
+
+it behaves as you typically would expect any kind of routing based on your URL to behave.
+Now the browser router, as I mentioned, is a component, so that means it behaves like a component.
+
+There is an open tag and a closing tag.
+
+And what we want to do is we want to make that the parent of our entire application.
+
+```
+<BrowserRouter>
+  <App />
+</BrowserRouter>
+
+```
+because we've wrapped our application component inside of our browser router
+component, we can access all of the different features that come in rack router dom specific to this
+browser router that is now going to control all of routing inside of our nested application.
+
+I'm going to make another folder inside of the routes folder called Home because that's the route we're
+
+trying to make.
+
+Copy-paste whole code of App.jsx and paste it to the new folder with new file component
+> src>routes>home>home.component.jsx
+
+and then I did some change
+
+> directory.component.jsx
+```
+import Directory from '../../components/directory/directory.component'
+
+
+const Home = () => {
+  const categories = [
+    {
+      "id": 1,
+      "title": "hats",
+      "imageUrl": "https://i.ibb.co/cvpntL1/hats.png"
+    },
+    {
+      "id": 2,
+      "title": "jackets",
+      "imageUrl": "https://i.ibb.co/px2tCc3/jackets.png"
+    },
+    {
+      "id": 3,
+      "title": "sneakers",
+      "imageUrl": "https://i.ibb.co/0jqHpnp/sneakers.png"
+    },
+    {
+      "id": 4,
+      "title": "womens",
+      "imageUrl": "https://i.ibb.co/GCCdy8t/womens.png"
+    },
+    {
+      "id": 5,
+      "title": "mens",
+      "imageUrl": "https://i.ibb.co/R70vBrQ/men.png"
+    }
+  ]
+  
+
+
+  return (
+  <Directory categories={categories} />
+  )
+}
+
+
+export default Home;
+```
+
+They're not these generic components that we're building that we can use in numerous places.
+
+Essentially, these home components are these route level components are really only used for routing.
+
+Now import the whole component in App.jsx
+
+```
+import Home from './routes/home/home.component'
+```
+
+What we want to do now is we now want to actually leverage routing so that we know how the routing works
+
+with this actually being the thing that only renders when the URL is pointing to home.
+
+So to do this, what we need to do is we need to import the roots component from React router dump.
+
+
+```
+import { Routes, Route } from 'react-router-dom'
+```
+
+It's with these two components that we can actually assemble the routing at our application level.
+
+So I want to take routes and just as we did, we want to wrap Anything that is going to be reputable inside of this roots component
+
+
+```
+const App = () => {
+  return (
+    <Routes>
+      <Route />
+    </Routes>
+  )
+}
+
+```
+So what essentially Routes does is that it allows this application to register these route level components that will then in turn render a specific component when it matches its specific route that you're looking
+for.
+
+So how do you know what route you're trying to match?
+
+Well, the way you do that is you actually give it a specific <b>path</b>.
+
+```
+<Route path='/' />
+```
+
+Variable path is going to be a string, and the string is going to try to match whatever you give inside of it.
+
+So when you want to match, a slash('/'), this in turn will say, okay,  I match path '/'
+meaning that because this is at the base URL level, when we just land on the URL, then I'm going to match.
+
+So you can kind of see slash as and this is the end of the path we're trying to match.
+
+So this is the relative path.
+
+And what I'm going to say here is that the moment this matches, I want you to now render this element.
+
+```
+<Route path='/' element={<Home />} />
+```
+<b>element</b> in this particular case is the component.
+
+And this is going to  render the home component.
+
+You're saying that by using this route component ({Routes, Route}), I expect there to be some routes inside and the moment you match a route where the path value('/') matches the string, then I want you to render(<Home />)
