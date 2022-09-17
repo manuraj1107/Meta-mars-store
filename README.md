@@ -1,28 +1,32 @@
-#Meta-mars tech-store
+# Meta-mars tech-store
 
-installation - npm init vite
+> installation - npm init vite
 
-App Name - Meta-mars
+> App Name - Meta-mars
 
-choose 'react' framework
+> choose 'react' framework
 
-after that in terminal
+<h4>after that in terminal</h4>
 > npm install
->npm run dev
+> npm run dev
 
-Lets Build our React E-Commerce App
+## Lets Build our React E-Commerce App
 
 1. We gonna build categories with 5 different cards(Gaming, music, merch, Drone, VR headset) and each card is container in itself(inside of it is image and another div with another text element inside it )
 
-# I'll create a div with classname= 'categories-container' because that pretty much it is 
+2. I'll create a div with classname= 'categories-container' because that pretty much it is 
 
-# Inside it we create five different divs that have className='category-container', also this category container will contain all the content inside of it as follows:
+3.  Inside it we create five different divs that have className='category-container', also this category container will contain all the content inside of it as follows:
+```
+ <img />
+ div with className = 'category-body-container'
+ ```
 
-## <img>
-## div with className = 'category-body-container'
-inside this body-container we will add some more elements
-### <h2>Hats</h2>
-### <p>Shop Now</p>
+> inside this body-container we will add some more elements
+```
+ <h2>Hats</h2>
+ <p>Shop Now</p>
+ ```
 
 Now copy whole categories-container  and paste it five times and change its #h2 with Men, Womens,Sneakers,jackets, hats
 
@@ -495,3 +499,21 @@ export default App
 ```
 
 Now we can't put this category component in App.jsx , we need create a diectory component for categories
+
+
+## Adding Font Style
+
+here I'm using Work Sans
+
+Google fonts - font-family: 'Work Sans', sans-serif;
+
+put this font-family on 'index.scss'
+
+and the link in 'index.html'
+
+```
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@100;300;400;600;700&display=swap" rel="stylesheet">
+```
+
