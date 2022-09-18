@@ -673,3 +673,122 @@ And what I'm going to say here is that the moment this matches, I want you to no
 And this is going to  render the home component.
 
 You're saying that by using this route component ({Routes, Route}), I expect there to be some routes inside and the moment you match a route where the path value('/') matches the string, then I want you to render(<Home />)
+
+
+
+
+### React Router Outlet
+
+
+Now inside of the home route, I have switched the path back to just the slash and we're going to dive a little deeper into understanding how this root component works.
+
+> home.component.jsx
+
+```
+import { Outlet } from 'react-router-dom'
+import Directory from '../../components/directory/directory.component'
+
+
+const Home = () => {
+  const categories = [
+    {
+      "id": 1,
+      "title": "hats",
+      "imageUrl": "https://i.ibb.co/cvpntL1/hats.png"
+    },
+    {
+      "id": 2,
+      "title": "jackets",
+      "imageUrl": "https://i.ibb.co/px2tCc3/jackets.png"
+    },
+    {
+      "id": 3,
+      "title": "sneakers",
+      "imageUrl": "https://i.ibb.co/0jqHpnp/sneakers.png"
+    },
+    {
+      "id": 4,
+      "title": "womens",
+      "imageUrl": "https://i.ibb.co/GCCdy8t/womens.png"
+    },
+    {
+      "id": 5,
+      "title": "mens",
+      "imageUrl": "https://i.ibb.co/R70vBrQ/men.png"
+    }
+  ]
+  
+
+
+  return (
+    <div>
+    <Outlet />
+  <Directory categories={categories} />
+  </div>
+  )
+}
+
+
+export default Home;
+```
+
+> App.jsx
+
+```
+import { Routes, Route, Outlet } from 'react-router-dom'
+import Home from './routes/home/home.component'
+
+
+const Navigation = () => {
+  return(
+    <div>
+      <div>
+        <h1>I am the navigation bar</h1>
+      </div>
+      <Outlet />
+    </div>
+  )
+}
+
+const Shop = () => {
+  return <h1>I am the shop page</h1>
+}
+
+
+function App() {
+ 
+  return (
+    <Routes>
+    <Route path='/' element={<Navigation />}>
+      <Route index path='home' element={<Home />} />
+      <Route path='shop' element={<Shop />} />
+
+      </Route>
+   </Routes>
+  )
+}
+
+export default App
+
+```
+
+> navigation.component.jsx
+
+```
+import { Fragment } from 'react';
+import {Outlet } from 'react-router-dom'
+
+
+const Navigation = () => {
+  return(
+    <Fragment>
+      <div className='navigation'>
+        <h1>I am the navigation bar</h1>
+      </div>
+      <Outlet />
+    </Fragment>
+  )
+}
+
+export default Navigation;
+```
