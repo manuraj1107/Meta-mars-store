@@ -792,3 +792,328 @@ const Navigation = () => {
 
 export default Navigation;
 ```
+
+
+### Authentication and Storage
+
+We're going to leverage a great existing tool made by Google called Firebase.
+
+And what Firebase is going to help us do is we are going to be able to build out our sign in page using
+
+authentication so that we can store the users and refer to those users and sign in those users whenever
+
+anyone wants to access our application.
+
+Luckily for us with Firebase, we can also leverage sign in with Google, which is Google sign in which
+
+we'll talk about after we learn about Firebase first.
+
+So what is Firebase?
+
+Firebase is a Google platform that allows you to spin up a database.
+
+It actually is a pretty comprehensive suite of hosting tools and different things for your website,
+
+but the primary usage is that it helps us leverage some kind of database.
+
+That's the most important thing so that we do not have to set our own up.
+
+
+> https://firebase.google.com/
+
+now click on <b>Go To Console</b> upon the top-right corner
+
+What this will do is this will take you to the list of all of your existing Firebase projects.
+
+So  you're going  make a brand new project.
+
+I want you to click to this <b>add project</b>
+
+put the name of  project of your choice
+eg. Facebook-db
+
+after naming you'll see it generate a unique identifier for your project
+
+click <b>Continue</b>
+
+Next step, they're going to ask if you want Google Analytics.
+
+I don't want Google Analytics because this actually makes it a little bit more complicated. so just disable it
+
+Click <b>Create Project</b>
+
+This will now take you into your actual facebook database or whatever you named your Firebase instance.
+
+there's two main things that I want you to focus on inside of your project.
+
+One is <b>Authentication</b>, and other is database options.
+
+We are going to use <b>firestore database</b> because this is the newest instance.
+
+<b>Realtime database</b> is their old database.
+
+So don't worry about that Just ignore it.
+
+We need to actually allow our React application to leverage Firebase and Fire Store and authentication.
+And to do that, we need to install the Firebase Library.
+
+So in order to install Firebase, let's go back to our terminal.
+
+> npm install firebase
+
+So now that we have Firebase installed, what we're going to do is we're just going to go into our application
+
+and just set up a quick route for sign in.
+
+So inside of routes, I'm going to make a new folder called Sign In.
+
+And inside of this folder, let's make a new file called Sign in Component
+
+> routes> sign-in> sign-in.component.jsx
+
+```
+const SignIn = () => {
+  return (
+    <div>
+      <h1>Sign In Page</h1>
+    </div>
+  );
+};
+
+export default SignIn;
+
+
+```
+
+
+So here, let's duplicate our route path.
+
+And the path should go to sign in.
+
+
+> App.jsx
+```
+import SignIn from './routes/sign-in/sign-in.component'
+
+
+// paste this inside Routes
+
+<Route path='sign-in' element={<SignIn />} />
+
+
+```
+
+
+
+
+
+
+
+
+And once we have our sign in, what we also need to add is a way to get there.
+
+So inside of your navigation component, I want you to duplicate this second link and inside say that
+
+it goes to sign in.
+
+> navigation.components.jsx
+
+```
+         <Link className='nav-link' to='/sign-in'>
+            SIGN IN
+         </Link>
+```
+
+
+### Authenticating with Firebase
+
+The first thing that I want you to think about is the fact that we are going to be interacting with
+
+this new API.
+
+The API in this particular case is going to be Firebase.
+
+So in this particular case, what I might do is inside of source, I want to make a new folder and I'm
+
+going to call it Utils.
+
+This is going to contain utility files.
+
+And the one that I want to make is a Firebase utility file.
+
+So I'm going to make a Firebase folder.
+
+And inside a firebase, I'm going to make <b>Firebase.utils.js</b>
+
+> src> utils> firebase> firebase.utils.js
+
+why just .js or javascript
+because We're most likely not going to return any JSON from this and this library is just for using Firebase.
+
+Is inside of this utility folder.
+
+Set up everything we need to get started.
+
+So in order for you to use Firebase, you actually need to import from Firebase.
+
+And then '/'.
+
+What is that you want to pull in?
+
+```
+import {} from 'firebase/app'
+```
+
+So Firebase, is a suite of tools.
+
+Firestore is one of the tools inside.
+
+So this suite, though, you bring down from the library as a thing called the app.
+
+So this captures all of the things required to get Firebase running, including if it's internal services.
+
+So in order for you to get it, you need the <b>initializeApp</b> function.
+
+```
+import { initializeApp } from 'firebase/app'
+```
+This <b>initializeApp</b> function creates an app instance for you based off of some type of config,
+
+This config is an object that allows us to attach this Firebase app instance to that instance that we have online, because right now we have the library installed, but there's no way of us telling Firebase,
+
+ this instance that you're using should be referring to the one that you have created inside of Firebase Console.
+
+ so how do we do this?
+
+ go back to your firebase homepage and click on this Web icon '</>'
+
+ after clicking, Register your app put the nickname related to your projects
+ eg- facebook-db-app
+
+ click <b>Register App</b>
+
+ then you'll see its telling us to install  but we've already installed firebase , so you can skip  it
+
+ next you can see its asking us to embed the script tag 
+ copy the <b>firebaseConfig</b> and paste it to your <b>firebase.utls.js</b>
+
+  ```
+  const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "MESSAGING_SENDER",
+  appId: "APP_ID"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+
+  ```
+
+So here when you paste this in.
+
+You end up passing this to the InitializeApp function that we get from Firebase app.
+
+What this config does is it identifies this SDK, which is essentially a developer kit that we're using.
+
+
+```
+const app = initializeApp(firebaseConfig);
+```
+So the library itself, this library is just some JavaScript library that abstracts away some of the functionality that we need to use in order to interact with our instance.
+
+this library is just some JavaScript library that abstracts away some of the functionality that we need to use in order to interact with our instance.
+
+So those CRUD actions like creating, reading, updating, destroying, authenticating, all of those things is going to happen using this Firebase app instance.
+
+
+So now that we have Firebase set up, the next thing we need to do is we need to actually set up the authentication.
+
+Firebase kind of includes a bunch of different library packages for us.
+
+When we installed Firebase, it wasn't just one library, it was a bunch of little micro libraries.
+
+One of them is anything related to authentication, and this is under 'firebase/auth'.
+ this is pretty much the auth service
+
+ ```
+import {} from 'firebase/auth';
+ ```
+
+what we need from here is  <b>getAuth</b> because just like 
+<b>initializeApp</b>, we've got to create a auth instance as well.
+
+ ```
+import { getAuth } from 'firebase/auth';
+ ```
+
+We also need sign in with redirect and sign in with pop up, 
+
+```
+import { getAuth, signInWithRedirect, signInWithPopup } from 'firebase/auth';
+```
+
+The other thing we need is also Google auth provider, So these are all namespace specifically from Firebase Auth.
+
+```
+import { getAuth, signInWithRedirect, signInWithPopup , GoogleAuthProvider } from 'firebase/auth';
+```
+
+So in order to use this Google authentication, we need to first initialize a provider using this Google auth provider class that we received.
+So here you want to call new <b>GoogleAuthProvider</b>, which in turn will give you back this provider instance.
+
+```
+const provider = new GoogleAuthProvider();
+
+```
+
+Then we will want to do is we want to call <b>setCustomParameters</b>.
+
+So these custom parameters will take some kind of configuration object and with it we can tell different ways that we want this GoogleAuthProvider to behave.
+
+```
+provider.setCustomParameters();
+```
+
+we want is really just <i>prompt</i> Which will be <i>select_account</i>.
+
+```
+provider.setCustomParameters({
+    prompt: "select_account"
+  });
+```
+
+this means is that every time somebody interacts with our provider, we want to always force them to select an account.
+
+The other thing we need to do is we need to export our authentication
+```
+export const auth = getAuth();
+export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+```
+
+
+> sign-in.components.jsx
+
+```
+import {signInWithGooglePopup}  from '../../utils/firebase/firebase.utils'
+
+const SignIn = () => {
+
+   const logGoogleUser = async () => {
+    const response = await signInWithGooglePopup();
+    console.log(response);
+   }
+
+    return (
+      <div>
+        <h1>Sign In Page</h1>
+        <button onClick={logGoogleUser}>Sign in with Google Popup</button>
+      </div>
+    );
+  };
+  
+  export default SignIn;
+```
