@@ -1208,5 +1208,213 @@ const SignIn = () => {
   };
   
   export default SignIn;
-  
+
 ```
+
+### Sign-In with Redirect
+
+> firebase.utils.js
+
+```
+import { initializeApp } from 'firebase/app'
+import { getAuth, signInWithRedirect, signInWithPopup , GoogleAuthProvider } from 'firebase/auth';
+
+import {getFirestore, doc, getDoc, setDoc} from 'firebase/firestore'
+
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "MESSAGING_SENDER",
+  appId: "APP_ID"
+  };
+
+  const firebaseApp = initializeApp(firebaseConfig);
+
+  const provider = new GoogleAuthProvider();
+
+  provider.setCustomParameters({
+    prompt: "select_account",
+  });
+
+  export const auth = getAuth(firebaseApp);
+  export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+  export const signInWithGoogleRedirect = () => signInWithRedirect(auth, provider); 
+
+  export const db = getFirestore();
+
+  export const createUserDocumentFromAuth = async (userAuth) => {
+    const userDocRef = doc(db, 'users', userAuth.uid);
+    console.log(userDocRef);
+
+    const userSnapShot = await getDoc(userDocRef);
+    console.log(userSnapShot);
+    console.log(userSnapShot.exists());
+  
+
+ 
+  if(!userSnapShot.exists()){
+
+    const {displayName, email}  = userAuth;
+    const createdAt = new Date();
+  
+
+  try {
+    await setDoc(userDocRef, {
+      displayName,
+      email,
+      createdAt
+    })
+  } catch (error) {
+       console.log('error creating the user', error.message);
+  }
+}
+
+  return userDocRef;
+}
+```
+
+
+> sign-in.components.jsx
+
+```
+import { useEffect } from 'react';
+import { getRedirectResult } from 'firebase/auth';
+import {
+  auth,
+  signInWithGooglePopup, 
+  createUserDocumentFromAuth, 
+  signInWithGoogleRedirect}  from '../../utils/firebase/firebase.utils'
+
+const SignIn = () => {
+useEffect(async () => {
+ const response = await getRedirectResult(auth);
+ if(response) {
+  const userDocRef = await createUserDocumentFromAuth(response.user);
+ }
+}, []);
+
+
+   const logGoogleUser = async () => {
+    const {user} = await signInWithGooglePopup();
+    const userDocRef = await createUserDocumentFromAuth(user);
+   };
+
+
+    return (
+      <div>
+        <h1>Sign In Page</h1>
+        <button onClick={logGoogleUser}>Sign in with Google Popup</button>
+        <button onClick={signInWithGoogleRedirect}>Sign in with Google Redirect</button>
+      </div>
+    );
+  };
+  
+  export default SignIn;
+
+```
+
+### SignUp Form
+
+Lets build a SignUp Form
+
+first create a folder named <b>sign-up-form</b> inside <b>components</b> folder
+
+Create a new file named sign-up-form.components.jsx
+
+> sign-up-form.components.jsx
+
+```
+const SignUpForm = () => {
+    return (
+        <div>
+            <h1>Sign up with your email and password</h1>
+            <form onSubmit={() => {}}>
+                <label>Display Name</label>
+                <input type="text" required />
+
+                <label>Email</label>
+                <input type="email" required />
+
+                <label>Password</label>
+                <input type="password" required />
+
+                <label>Confirm Password</label>
+                <input type="password" required />
+
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+    )
+}
+
+export default SignUpForm;
+
+```
+import SignUpForm inside sign-in component
+
+> sign-in.components.jsx
+
+```
+import SignUpForm from '../../components/sign-up-form/sign-up-form.component';
+
+
+// inside return
+
+<button onClick={logGoogleUser}>Sign in with Google Popup</button>
+        <SignUpForm />
+```
+
+### Sign-up form pt-1
+
+```
+import {useState} from 'react';
+
+const defaultFormFields = {
+    displayName: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+}
+
+
+const SignUpForm = () => {
+
+   const [formFields, setFormFields] = useState(defaultFormFields);
+   const {displayName, email, password, confirmPassword} = formFields;
+
+   const handleChange = (event) => {
+       const {name, value} = event.target;
+
+       setFormFields({...formFields, [name]: value });
+   }
+
+    return (
+        <div>
+            <h1>Sign up with your email and password</h1>
+            <form onSubmit={() => {}}>
+                <label>Display Name</label>
+                <input type="text" required onChange={handleChange} name="displayName" value={displayName} />
+
+                <label>Email</label>
+                <input type="email" required onChange={handleChange} name="email" value={email} />
+
+                <label>Password</label>
+                <input type="password" required onChange={handleChange} name="password" value={password} />
+
+                <label>Confirm Password</label>
+                <input type="password" required onChange={handleChange} name="confirmPassword" value={confirmPassword} />
+
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+    )
+}
+
+export default SignUpForm;
+```
+
+
+###  Sign-Up Form pt-2
+
