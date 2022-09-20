@@ -27,31 +27,26 @@ const firebaseConfig = {
   export const createUserDocumentFromAuth = async (
     userAuth, 
     additionalInformation = {}
-    
     ) => {
     if (!userAuth) return;
     
     const userDocRef = doc(db, 'users', userAuth.uid);
-    console.log(userDocRef);
-
+  
     const userSnapShot = await getDoc(userDocRef);
-    console.log(userSnapShot);
-    console.log(userSnapShot.exists());
+    
   
 
-  if(!userSnapShot.exists()){
-
-    const {displayName, email}  = userAuth;
+  if (!userSnapShot.exists()){
+    const { displayName, email }  = userAuth;
     const createdAt = new Date();
   
-
   try {
     await setDoc(userDocRef, {
       displayName,
       email,
       createdAt,
       ...additionalInformation,
-    })
+    });
   } catch (error) {
        console.log('error creating the user', error.message);
   }
@@ -63,5 +58,6 @@ const firebaseConfig = {
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
 
   if(!email || !password) return;
-  createUserWithEmailAndPassword(auth, email, password)
+  
+  return await createUserWithEmailAndPassword(auth, email, password);
 }

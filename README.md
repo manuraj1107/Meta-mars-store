@@ -1418,3 +1418,161 @@ export default SignUpForm;
 
 ###  Sign-Up Form pt-2
 
+> sign-up-form.components.jsx
+
+```
+import {useState} from 'react';
+import { createAuthUserWithEmailAndPassword, createUserDocumentFromAuth } from '../../utils/firebase/firebase.utils';
+
+const defaultFormFields = {
+    displayName: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+}
+
+
+const SignUpForm = () => {
+
+   const [formFields, setFormFields] = useState(defaultFormFields);
+   const {displayName, email, password, confirmPassword} = formFields;
+
+   console.log(formFields);
+
+   const resetFormField = () => {
+    setFormFields(defaultFormFields)
+   }
+
+   const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if(password !== confirmPassword) {
+        alert('passwords do not match')
+        return;
+    }
+
+    try {
+     const { user } = await createAuthUserWithEmailAndPassword(
+        email, 
+        password
+     );
+     
+     await createUserDocumentFromAuth(user, {displayName} );
+     resetFormField();
+    } catch(error){
+        if(error.code === 'auth/email-already-in-use'){
+            alert('Cannot create user, email already in use');
+        }
+        else{
+       console.log('user creation encountered a error', error);
+    }
+    }
+   };
+
+   const handleChange = (event) => {
+       const {name, value} = event.target;
+
+       setFormFields({...formFields, [name]: value });
+   }
+
+    return (
+        <div>
+            <h1>Sign up with your email and password</h1>
+            <form onSubmit={handleSubmit}>
+                <label>Display Name</label>
+                <input type="text" required onChange={handleChange} name="displayName" value={displayName} />
+
+                <label>Email</label>
+                <input type="email" required onChange={handleChange} name="email" value={email} />
+
+                <label>Password</label>
+                <input type="password" required onChange={handleChange} name="password" value={password} />
+
+                <label>Confirm Password</label>
+                <input type="password" required onChange={handleChange} name="confirmPassword" value={confirmPassword} />
+
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+    )
+}
+
+export default SignUpForm;
+```
+
+
+> firebase.utils.js
+
+```
+import { initializeApp } from 'firebase/app'
+import { getAuth, signInWithRedirect, signInWithPopup , GoogleAuthProvider, createUserWithEmailAndPassword } from 'firebase/auth';
+
+import {getFirestore, doc, getDoc, setDoc} from 'firebase/firestore'
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDTfuUdHnrWmQUSebfcJvybiqnvyKGQFuQ",
+    authDomain: "meta-mars-db.firebaseapp.com",
+    projectId: "meta-mars-db",
+    storageBucket: "meta-mars-db.appspot.com",
+    messagingSenderId: "446327056706",
+    appId: "1:446327056706:web:c69910ac6033f9fd7e80db"
+  };
+
+  const firebaseApp = initializeApp(firebaseConfig);
+
+  const provider = new GoogleAuthProvider();
+
+  provider.setCustomParameters({
+    prompt: "select_account",
+  });
+
+  export const auth = getAuth();
+  export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+  export const db = getFirestore();
+
+  export const createUserDocumentFromAuth = async (
+    userAuth, 
+    additionalInformation = {}
+    
+    ) => {
+    if (!userAuth) return;
+    
+    const userDocRef = doc(db, 'users', userAuth.uid);
+    console.log(userDocRef);
+
+    const userSnapShot = await getDoc(userDocRef);
+    console.log(userSnapShot);
+    console.log(userSnapShot.exists());
+  
+
+  if(!userSnapShot.exists()){
+
+    const {displayName, email}  = userAuth;
+    const createdAt = new Date();
+  
+
+  try {
+    await setDoc(userDocRef, {
+      displayName,
+      email,
+      createdAt,
+      ...additionalInformation,
+    })
+  } catch (error) {
+       console.log('error creating the user', error.message);
+  }
+}
+
+  return userDocRef;
+};
+
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+
+  if(!email || !password) return;
+  return await createUserWithEmailAndPassword(auth, email, password);
+}
+
+```
+
+
+### Generalizing Form Input
