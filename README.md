@@ -1576,3 +1576,146 @@ export const createAuthUserWithEmailAndPassword = async (email, password) => {
 
 
 ### Generalizing Form Input
+
+> assets> components> form-input> form-input.component.jsx 
+
+> form-input.component.jsx
+
+```
+import './form-input.styles.scss';
+const FormInput = ({label, ...otherProps}) => {
+
+    return(
+        <div className="group">
+         <input className="form-input" {...otherProps} />
+        {label && (
+            <label className={`${otherProps.value.length ? 'shrink' : '' } form-input-label`} >{label}</label>
+        )}
+               
+        </div>
+    )
+}
+
+export default FormInput
+```
+
+> sign-up-form.components.jsx
+
+```
+import FormInput from '../form-input/form-input.component';
+
+// replace the form with this 
+
+<form onSubmit={handleSubmit}>
+                
+                <FormInput label='Display Name' type="text" required onChange={handleChange} name="displayName" value={displayName} />
+
+                
+                <FormInput label='Email' type="email" required onChange={handleChange} name="email" value={email} />
+
+                
+                <FormInput label='Password' type="password" required onChange={handleChange} name="password" value={password} />
+
+                
+                <FormInput label='Confirm Password' type="password" required onChange={handleChange} name="confirmPassword" value={confirmPassword} />
+
+                <button type="submit">Sign Up</button>
+            </form>
+```
+
+#### Adding Button component
+
+there are three types of button default(black-white), inverted(white-black) and Google sign-in(blue)
+
+> components> button> button.component.jsx
+
+> button.component.jsx
+
+```
+import './button.styles.scss'
+
+const BUTTON_TYPE_CLASSES = {
+    google: 'google-sign-in',
+    inverted: 'inverted'
+}
+
+
+const Button = ({children, buttonType, ...otherProps}) => {
+    return (
+        <button className={`button-container ${BUTTON_TYPE_CLASSES[buttonType]}`}>{children}</button>
+    )
+}
+
+export default Button;
+```
+
+here 
+1. children prop is for button text like <b>SIGN-IN</b>, <b>ADD TO CART</b> and <b>GOOGLE SIGN-IN</b>.
+
+2. buttonType is for BUTTON_TYPE_CLASSES.
+
+3. ...otherProps will contain type of button which could be "text", 'submit' etc
+
+
+
+
+> button.styles.scss
+
+```
+.button-container {
+    min-width: 165px;
+    width: auto;
+    height: 50px;
+    letter-spacing: 0.5px;
+    line-height: 50px;
+    padding: 0 35px 0 35px;
+    font-size: 15px;
+    background-color: black;
+    color: white;
+    text-transform: uppercase;
+    font-weight: bolder;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+  
+    &:hover {
+      background-color: white;
+      color: black;
+      border: 1px solid black;
+    }
+  
+    &.google-sign-in {
+      background-color: #4285f4;
+      color: white;
+  
+      &:hover {
+        background-color: #357ae8;
+        border: none;
+      }
+    }
+  
+    &.inverted {
+      background-color: white;
+      color: black;
+      border: 1px solid black;
+  
+      &:hover {
+        background-color: black;
+        color: white;
+        border: none;
+      }
+    }
+  }
+  
+```
+Just change 'button' tag with Button Component
+> sign-up-form.component.jsx
+
+```
+import Button from '../button/button.component';
+
+
+
+<Button type="submit">Sign Up</Button>
+```
