@@ -1719,3 +1719,6 @@ import Button from '../button/button.component';
 
 <Button type="submit">Sign Up</Button>
 ```
+
+
+#### Rename Sign-in folder and Sign-in component to authentication and authentication.component
