@@ -1722,3 +1722,309 @@ import Button from '../button/button.component';
 
 
 #### Rename Sign-in folder and Sign-in component to authentication and authentication.component
+
+
+
+### React-Context for state management
+
+let's see how to create a context in the first place
+
+It's very similar to a component that wraps around all of your other components that
+need access to this context. context you can kind of see as a storage place, except it's a component
+that exclusively stores things, so lets build something with context inside of your src folder. create a folder
+named contexts and inside it craete a file named <b>user.context.jsx</b>
+
+So, In order to use this context, we need to first create a Context, and we'll do it using <b>createContext</b> method that we get form react.
+
+```
+import { createContext } from 'react'
+```
+
+Now, In order to create this context, we first need to actually export out the context itself.
+
+So you can see the context as being two pieces:
+<ul>
+<li>one is the actual storage thing itself, and this is the <b>literal context</b> but for us because it's a user context, we going to call it <b>UserContext</b> and this is equal to calling <b>createContext</b> which will build out a context for us</li>
+</ul>
+
+```
+import { createContext } from "react";
+
+// look it as the actuall value you want to access
+export const UserContext = createContext({
+
+})
+```
+
+what we want to pass to it is the default value, not necessarily the initial value, but kind of like the default value
+
+<ul>
+<li>Then there is also going to be a provider</li>
+</ul>
+
+Now we want to export both of these, the context(<b>UserContext</b>) and the provider(<b>UserProvider</b>).
+
+> So a provider is the actual component
+
+This user provider is going to be this literal functional component.
+
+```
+export const UserProvider = ({children}) => {
+
+}
+
+```
+
+what we do is we receive children and And  to return <b>UserContext.Provider</b>
+
+```
+export const UserProvider = ({children}) => {
+ return <UserContext.Provider></UserContext.Provider>
+}
+
+```
+
+So on every context that gets built for us, there is a Provider and the .Provider is the component
+that will wrap around any other components that need access to the values inside.
+In here we are just going to render the children.
+
+```
+export const UserProvider = ({children}) => {
+ return <UserContext.Provider>{children}</UserContext.Provider>
+}
+
+```
+So we want to take this children and then put it around our <b>UserContext.Provider</b>.
+This is really just some kind of alias component that allows us to use this UserContext provider and
+wrap the children.
+
+So what else do we need to pass to this provider?
+Well, this provider is where it's going to receive the value, which is going to hold the actual contextual
+values.
+
+
+```
+export const UserProvider = ({children}) => {
+ const [currentUser, setCurrentUser] = useState(null);
+ const value = {currentUser, setCurrentUser};
+
+ return <UserContext.Provider value={value}>{children}</UserContext.Provider>
+}
+```
+
+What we know is that we want to store a user object.So current user, for example, and what we can do because is a component is leverage all of our hooks that allow us to store things.So we want to store a user state.
+Let's just use the use state hook.And here I'm going to say that current user gets both the actual value but also the setter function.And I want to be able to initialize this value as null.
+
+```
+const [currentUser, setCurrentUser] = useState(null);
+```
+
+Next,What I want to do is I want to actually generate the value that I'm going to pass in here.
+So this is going to be an object that passes the two values that are important, which is both the <b>currentUser</b> as well as the <b>setCurrentUser</b>.So both the setter function and the actual value.
+
+```
+const value = {currentUser, setCurrentUser};
+```
+So what you can think about with this provider is that this provider is essentially allowing any of
+its child components({children}) to access the values inside of its <b>useState</b>.So we're just doing just as we normally do, we have a value for that.
+
+```
+return <UserContext.Provider value={}>{children}</UserContext.Provider>
+```
+But I want to be able to call this setter and get the value anywhere inside of the component
+tree that is nested within this actual provider value.which means the value can be access globally if its nested inside the .Provider.
+
+So then all we do is we pass this value into here
+```
+value={value}
+```
+
+ and now we go back to this context and remember we're
+
+trying to instantiate the initial point of this
+
+```
+import { createContext, useState } from "react";
+
+export const UserContext = createContext({
+  currentUser: null,
+  setCurrentUser: () => null,
+});
+
+export const UserProvider = ({children}) => {
+    const [currentUser, setCurrentUser] = useState(null);
+    const value = {currentUser, setCurrentUser};
+   
+    return <UserContext.Provider value={value}>{children}</UserContext.Provider>
+   }
+```
+
+Now In our <b>index.js</b>
+
+we gonna import the context which is UserProvider component from our context folder
+
+> main.js
+```
+import { UserProvider } from './contexts/user.context'
+
+```
+Now we all need to do is wrap our '<App />' inside the UserProvider,
+```
+<BrowserRouter>
+      <UserProvider>
+      <App />
+      </UserProvider>
+    </BrowserRouter>
+```
+Now any component inside of this UserProvider, nested deeply inside the '<App />' can access the context value inside of the provider itself, meanwhile anything outside the UserProvider component cannot access the context.
+
+Now inside of our <App />,we want the Sign-in-Form Component to be able to access the context because whenever the user signed in, we want to take this user object and store it inside the context
+
+```
+try {
+      const {user} = await signInAuthUserWithEmailAndPassword(
+        email,
+        password
+      );
+    
+```
+
+for storing the context,we need to do two things!
+
+First we need to use the <b>useContext</b> hook
+
+```
+import {useContext} from 'react';
+```
+Second, we need to bring in the actuall context itself
+
+```
+import { UserContext } from '../../contexts/user.context'
+```
+This <b>UserContext</b> object will going to give us back the whatever <b>value</b> passed in for the <b>value</b>
+
+```
+// inside user.context.jsx
+
+return <UserContext.Provider value={value}>{children}</UserContext.Provider>
+```
+
+and our value is the currentUser of the useState as well as the setter function
+```
+ const [currentUser, setCurrentUser] = useState(null);
+    
+```
+
+So this <b>value</b> we have instantiated as an object
+```
+const value = {currentUser, setCurrentUser};
+```
+so we'll get this exact object back with whatever the current values inside of the UserProvider's useState is currently set up.
+
+So inside sign-in-form.componets.jsx we import UserContext
+
+```
+import { UserContext } from '../../contexts/user.context';
+```
+In order to utilize it what we need to do is, calling useConetxt with inside parameter UserContext, so as we now we'll get back the object, for our sign-in form we'll just set the value let's put the name setCurrentUser.
+```
+const SignInForm = () => {
+  const [formFields, setFormFields] = useState(defaultFormFields);
+  const { email, password } = formFields;
+
+// Come down and put it Here 
+  const {setCurrentUser} = useContext(UserContext);
+
+  const resetFormFields = () => {
+    setFormFields(defaultFormFields);
+  };
+```
+
+and I'm gonne run the setCurrentUser whenever  this <b>user</b> value comes back
+
+```
+try {
+      const {user} = await signInAuthUserWithEmailAndPassword(
+        email,
+        password
+      );
+     setCurrentUser(user);
+```
+
+Now what we wanna do is access this value inside of the our navigation.component
+so inside our navigation.component we do the same importing useContext and UserContext
+> navigation.component.jsx
+```
+import { useContext} from 'react';
+import { UserContext } from '../../contexts/user.context';
+```
+
+But this time we want with context the currentUserValue not the setter
+we gonna call useContext the same way we did before in sign-in-form, where we pulling the setter function inside of our form.
+
+But this time I want the actuall value of the currentUser
+
+```
+const Navigation = () => {
+
+  // put it here
+  const {currentUser} = useContext(UserContext);
+  console.log(currentUser)
+  return(
+    <Fragment>
+      <div className='navigation'>
+      <Link className='logo-container' to='/'>
+        <p className='logo'>Logo</p> 
+        </Link>
+        <div className='nav-links-container'>
+         <Link className='nav-link' to='/shop'>
+            SHOP
+         </Link>
+         <Link className='nav-link' to='/auth'>
+            SIGN IN
+         </Link>
+        </div>
+      </div>
+      <Outlet />
+    </Fragment>
+  )
+}
+
+```
+
+> What will happen or happening in this whole process?
+> Why this componenet will ran?
+
+So Once we console logged in currentUser that means our functional component re-renders, the reason why?
+
+```
+const {currentUser} = useContext(UserContext);
+```
+because the useContext as the hook tell this component that whenever the value inside of this context updates!! re-render me!!
+because we are leveraging this currentUser value, we are saying we want you to run my functional component and re-render me
+
+because this value inside of the <b>UserContext</b> is updated
+
+```
+export const UserContext = createContext({
+  currentUser: null,
+  setCurrentUser: () => null,
+});
+
+export const UserProvider = ({children}) => {
+    const [currentUser, setCurrentUser] = useState(null);
+    const value = {currentUser, setCurrentUser};
+   
+    return <UserContext.Provider value={value}>{children}</UserContext.Provider>
+   }
+
+```
+
+and the reason why it triggers is because of useState being called with the setter function
+```
+const [currentUser, setCurrentUser] = useState(null);
+```
+
+so as we know the component re-render whenever its state updates or whenever its prop changes
+
+
