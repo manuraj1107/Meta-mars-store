@@ -2028,3 +2028,284 @@ const [currentUser, setCurrentUser] = useState(null);
 so as we know the component re-render whenever its state updates or whenever its prop changes
 
 
+### React Context Continued
+
+#### Product Context
+
+create a file named <b>shop-data.json</b> inside src folder
+
+```
+[
+    {
+      "id": 1,
+      "name": "Brown Brim",
+      "imageUrl": "https://i.ibb.co/ZYW3VTp/brown-brim.png",
+      "price": 25
+    },
+    {
+      "id": 2,
+      "name": "Blue Beanie",
+      "imageUrl": "https://i.ibb.co/ypkgK0X/blue-beanie.png",
+      "price": 18
+    },
+    {
+      "id": 3,
+      "name": "Brown Cowboy",
+      "imageUrl": "https://i.ibb.co/QdJwgmp/brown-cowboy.png",
+      "price": 35
+    },
+    {
+      "id": 4,
+      "name": "Grey Brim",
+      "imageUrl": "https://i.ibb.co/RjBLWxB/grey-brim.png",
+      "price": 25
+    },
+    {
+      "id": 5,
+      "name": "Green Beanie",
+      "imageUrl": "https://i.ibb.co/YTjW3vF/green-beanie.png",
+      "price": 18
+    },
+    {
+      "id": 6,
+      "name": "Palm Tree Cap",
+      "imageUrl": "https://i.ibb.co/rKBDvJX/palm-tree-cap.png",
+      "price": 14
+    },
+    {
+      "id": 7,
+      "name": "Red Beanie",
+      "imageUrl": "https://i.ibb.co/bLB646Z/red-beanie.png",
+      "price": 18
+    },
+    {
+      "id": 8,
+      "name": "Wolf Cap",
+      "imageUrl": "https://i.ibb.co/1f2nWMM/wolf-cap.png",
+      "price": 14
+    },
+    {
+      "id": 9,
+      "name": "Blue Snapback",
+      "imageUrl": "https://i.ibb.co/X2VJP2W/blue-snapback.png",
+      "price": 16
+    }
+  ]
+```
+
+> Inside context folder create file named <b>product.context.jsx</b>
+
+```
+import { createContext, useState } from 'react';
+
+import PRODUCTS from '../shop-data.json';
+
+export const ProductsContext = createContext({
+  products: [],
+});
+
+export const ProductsProvider = ({ children }) => {
+  const [products, setProducts] = useState(PRODUCTS);
+  const value = { products };
+  return (
+    <ProductsContext.Provider value={value}>
+      {children}
+    </ProductsContext.Provider>
+  );
+};
+```
+
+> Inside routes create shop folder and create two new files
+
+> shop.component.jsx
+
+```
+import { useContext } from 'react';
+
+import ProductCard from '../../components/product-card/product-card.component';
+
+import { ProductsContext } from '../../contexts/products.context';
+
+import './shop.styles.scss';
+
+const Shop = () => {
+  const { products } = useContext(ProductsContext);
+
+  return (
+    <div className='products-container'>
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
+  );
+};
+
+export default Shop;
+```
+
+
+> shop.styles.scss
+
+```
+.products-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    column-gap: 10px;
+    row-gap: 50px;
+  }
+```
+
+
+Now Change some code for <b>App.jsx</b> and <b>main.jsx</b>
+
+> App.jsx
+
+```
+import { useContext } from 'react'
+import { Routes, Route, Navigate} from 'react-router-dom'
+import { UserContext } from './contexts/user.context'
+import Home from './routes/home/home.component'
+import Navigation  from './routes/navigation/navigation.component'
+import Authentication from './routes/authentication/authentication.component'
+import Shop from './routes/shop/shop.component'
+
+
+
+
+function App() {
+ const {currentUser} = useContext(UserContext);
+  return (
+    <Routes>
+    <Route path='/' element={<Navigation />}>
+      <Route index  element={<Home />} />
+      <Route path='shop' element={<Shop />} />
+      <Route 
+      path='auth' 
+      element={
+      currentUser ? <Navigate to='/' replace /> : <Authentication />
+      } 
+      />
+
+      </Route>
+   </Routes>
+  )
+}
+
+export default App
+
+
+```
+
+> main.jsx
+
+```
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import {BrowserRouter} from 'react-router-dom'
+import App from './App'
+import { UserProvider } from './contexts/user.context'
+import { ProductsProvider } from './contexts/products.context'
+import './index.scss'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <UserProvider>
+       <ProductsProvider>
+         <App />
+       </ProductsProvider>  
+      </UserProvider>
+    </BrowserRouter>
+  </React.StrictMode>
+)
+
+```
+
+#### Product Card
+
+> Inside components folder Create a new folder named 'product-card'
+
+Add two new files inside it
+##### 1. product-card.component.jsx
+##### 2. product-card.styles.scss
+
+> product-card.component.jsx
+
+```
+import './product-card.styles.scss'
+import Button from '../button/button.component'
+
+const ProductCard = ({product}) => {
+    const { name, price, imageUrl } = product;
+
+ return(
+    <div className='product-card-container'>
+    <img src={imageUrl} alt={`${name}`} />
+    <div className = 'footer'>
+         <span className='name'>{name}</span>
+         <span className='price'>${price}</span>
+    </div>
+    <Button buttonType='inverted'>Add to card</Button>
+</div>
+ )
+}
+
+
+export default ProductCard
+```
+
+> product-card.styles.scss
+
+```
+.product-card-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 350px;
+    align-items: center;
+    position: relative;
+  
+    img {
+      width: 100%;
+      height: 95%;
+      object-fit: cover;
+      margin-bottom: 5px;
+    }
+  
+    button {
+      width: 80%;
+      opacity: 0.7;
+      position: absolute;
+      top: 255px;
+      display: none;
+    }
+  
+    &:hover {
+      img {
+        opacity: 0.8;
+      }
+  
+      button {
+        opacity: 0.85;
+        display: flex;
+      }
+    }
+  
+    .footer {
+      width: 100%;
+      height: 5%;
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+  
+      .name {
+        width: 90%;
+        margin-bottom: 15px;
+      }
+  
+      .price {
+        width: 10%;
+      }
+    }
+  }
+```
