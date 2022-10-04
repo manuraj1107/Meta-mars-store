@@ -16,14 +16,9 @@ function App() {
     <Route path='/' element={<Navigation />}>
       <Route index  element={<Home />} />
       <Route path='shop' element={<Shop />} />
-      <Route 
-      path='auth' 
-      element={
-      currentUser ? <Navigate to='/' replace /> : <Authentication />
-      } 
-      />
+      <Route path='auth' element={ <Authentication />} />
 
-      </Route>
+     </Route>
    </Routes>
   )
 }
