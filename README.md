@@ -2702,3 +2702,116 @@ We want to make sure that all of our objects that we're trying to add to the col
 And to do that, we need to use a <b>batch</b>
 
 So a batch is what we get from that <b>writeBatch</b> method that we also import it from Firestore.
+
+So here, how to use it is we need to instantiate a batch class by saying, Hey, I want to make a batch and this batch is going to call writBatch.
+
+<b>writeBatch</b> is going to return me a batch and we have to pass it the database(db) that we're trying to make this batch on.
+
+```
+const batch = writeBatch(db);
+```
+
+So as you've seen with this trend, we just always pass the database(db) to whatever these methods that we've imported are.
+
+Now that I have this batch instance, what batch allows me to do is attach a bunch of different,
+let's say, writes, deletes, sets, whatever.
+
+We can attach all of those to the batch And only when we're ready to fire off the batch does the actual transaction begin.
+
+So what we need to do is we need to create a bunch of set events because each of these objects were saying, Hey, I want you to create and set that object(objectsToAdd) into this collection(collectionRef) as a new document for me.
+To do that,  we're going to say, Hey, objectsToAdd for each.So forEach of these objects, I want you to batch set for me.
+```
+objectsToAdd.forEach()
+```
+
+So here we're going to receive this object(obj) And if you remember, this object is inside of the SHOP_DATA.
+
+It's each of these category objects here with the title and the items array. that's we are adding, qwell we have five different objects
+
+So how we're going to do this is inside of Firebase Utils again with this object.
+Now I first want to get the document reference.So to get the document reference, I'm going to make one called docref.
+```
+objectsToAdd.forEach((object) => {
+  const docRef;
+})
+```
+
+And this is equal to calling the doc method which we've done before when we got the userDocRef method
+
+except in passing it. db I'm going to pass it the <b>collectionRef</b> because the collection ref actually tells directly this doc method which database we're using because we've got this collection ref from calling collection where the DB was already passed.
+
+```
+objectsToAdd.forEach((object) => {
+  const docRef= doc(collectionRef)
+})
+```
+
+So this doc is smart enough to know, Oh, you're giving me a collection ref?
+Most likely you got it because you've already told that collection ref what dbit's from.
+
+> collection(db, collectionKey)
+
+So then with this collectionRef, what we also need to get this document is the title or the key.
+
+What is the value? or The key value here, here these are actually the title on the object.
+
+Now I'm going to say, hey, give me object, give me the title, but then lowercase it because right
+
+```
+objectsToAdd.forEach((object) => {
+  const docRef= doc(collectionRef, object.title.toLowerCase());
+})
+```
+
+Then what we want to do is we want to say, okay, I want you to batch set.On this document reference because as we know.
+```
+objectsToAdd.forEach((object) => {
+  const docRef= doc(collectionRef, object.title.toLowerCase());
+  batch.set(docRef);
+})
+```
+Firebase will give us back a document reference, even if it doesn't exist yet.
+It will just point to that place for this specific key(object.title.toLowerCase()) inside of our collection(collectionRef).
+And now what we're saying is, hey, set that location and set it with the value of the object itself.
+You can pass it some JSON object and it will build out that structure for you and this is our entire batch.
+
+```
+objectsToAdd.forEach((object) => {
+  const docRef= doc(collectionRef, object.title.toLowerCase());
+  batch.set(docRef, object);
+})
+```
+
+Then what we need to do is we need to await actually firing off this batch because what happened is that we iterate(forEach) it over each individual object in the array.
+
+We added an additional batch set call on there(batch.set(docRef, object);), creating a new document reference for each of those objects where the key is the title and the value is the object itself.
+
+So now we say batch commit and this will begin firing it off.
+```
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) =>{
+    const collectionRef = collection(db, collectionKey);
+    const batch = writeBatch(db)
+
+    objectsToAdd.forEach((object) => {
+      const docRef= doc(collectionRef, object.title.toLowerCase());
+      batch.set(docRef, object);
+    });
+
+    await batch.commit();
+    console.log('done')
+  }
+```
+
+
+> Now inside products.context import this method addCollectionAndDocuments
+
+And fire off once with useEffect
+
+```
+useEffect(() => {
+    addCollectionAndDocuments('categories', SHOP_DATA)
+  }, [])
+```
+
+Once its uploaded to firestore remove the useEffect we dont need it anymore even remove the SHOP_DATA
+except th method
