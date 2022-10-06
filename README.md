@@ -2612,3 +2612,93 @@ So we need both the collections method and we need the writeBatch method
 ```
 import {getFirestore, doc, getDoc, setDoc, collection, writeBatch} from 'firebase/firestore'
 ```
+
+First, the collection method is the most important.
+We need the collection method because it will actually allow us the same way when we were getting a document reference(userDocRef) to get a collection reference because we're trying to write to a brand new collection.
+
+So here what I'm going to do is I am going to create a new function and I'm going to call it <b>addCollectionAndDocuments</b> because that's what we're doing.
+We're adding in some new collection as well as the actual documents inside of that collection
+
+So what I want to call this for my first variable that I'm going to pass in is the collection key. This is going to be that key that we saw inside of our cloud firestore DB.
+So, for example, the collection has users as the key. We want one that has categories as the key.
+
+```
+export const addCollectionAndDocuments = (collectionKey) =>{
+
+  }
+
+```
+So we're going to pass that as a string. But this is just what I'm calling a collection key.
+
+
+then the next argument is going to be the actual documents that we want to add.
+```
+export const addCollectionAndDocuments = (collectionKey, objectsToAdd) =>{
+
+  }
+
+```
+And this is our function
+
+
+The other thing to remember is because we're adding to an external source, this is most likely going to be a bunch of async behavior because we're essentially calling out up onto an API in order to store data.
+
+So this is async.
+
+```
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) =>{
+
+  }
+
+```
+
+What we want to do now is I want to think about how it is that we actually create the collection, because right now it doesn't exist.
+
+But as we learned with user document references, as long as we try and find something in the database,Firebase is actually going to create one for us, even if it's not populated, because that's what the document references in our particular case.
+
+Now we're making a collection reference.
+
+```
+const collectionRef = collection(db,)
+```
+So here collection reference(coolectionRef) is equal to collection passing in our DB(db) because we're saying, hey, go with our <b>db</b> instance as we know we did with Auth.
+
+This is exactly what we're doing with Firestore as well.
+
+We have one DB Singleton instance and we're saying, Hey, get me the collection within the DB and within this DB.
+
+What's specific collection key are you looking for?
+Well, this is going to be the collection key that we pass in.
+
+```
+const collectionRef = collection(db, collectionKey)
+```
+
+So you can imagine that when we actually call this function(addCollectionAndDocuments), we're going to give it categories.
+
+```
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) =>{
+    const collectionRef = collection(db, collectionKey)
+  }
+
+```
+
+
+So now that we have our collection reference, what we gonna do with it
+
+Well, now what we have to do is we need to think about 
+how to store each of these objects now insideof this new collection ref as a new document?
+Now we are writing multiple different documents into a collection, So for us to do this, we need to actually think about this concept of transactions.
+
+> A transaction is a word that represents a successful unit of work to a database.
+Now a unit of work differs.It might be multiple sets of setting values into a collection. For us, we consider a successful write to this collection if all of the documents successfully wrote to that database.
+
+This means that there are numerous writes involved in this one single transaction.
+The single transaction being we stored all of the objects into this collection.
+
+Just like real-world payment transaction(safe, secure without any network issue)
+We want to make sure that all of our objects that we're trying to add to the collection are successfully added.
+
+And to do that, we need to use a <b>batch</b>
+
+So a batch is what we get from that <b>writeBatch</b> method that we also import it from Firestore.

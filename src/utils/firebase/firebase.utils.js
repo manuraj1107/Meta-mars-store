@@ -34,6 +34,10 @@ const firebaseConfig = {
   export const signInWithGoogleRedirect = () => signInWithRedirect(auth, provider);
   export const db = getFirestore();
 
+  export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) =>{
+    const collectionRef = collection(db, collectionKey)
+  }
+
   export const createUserDocumentFromAuth = async (
     userAuth, 
     additionalInformation = {}
