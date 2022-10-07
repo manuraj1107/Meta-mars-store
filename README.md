@@ -3069,3 +3069,117 @@ const Shop = () => {
 
 export default Shop;
 ```
+
+
+### Nested Routes
+
+we're going to do is we are going to create our nested routes.
+
+We have this shop page already that we want as our base route.So we need to figure out how to set this up as its own component.And then we need to set up this nested route while accounting for in our current routing structure.
+
+So the first thing we need to do in order to make this component of shop nest able with its roots is
+
+> App.jsx
+```
+<Route path='shop' element={<Shop />} />
+```
+
+we need to say, okay, when you start matching this path, I know there will be a subsequent you are a parameter set after shop, whatever that set is. I don't care.
+
+```
+<Route path='shop/*' element={<Shop />} />
+```
+
+That's what this store represents.It's the wild card.
+This just means that I want you to match shop / anything.
+
+It doesn't matter. As long as you match that.
+I want you to forward them and render this component the shop component, because now the shop component is going to have its own roots inside.
+Now before we actually start implementing the routes, we need to duplicate this into the appropriate page component because now this shop component is going to be a collection preview.
+
+So let's make a new route Folder.
+
+And I want to call this my categories-preview because we're previewing multiple categories And similarly, of course, we'll need the categories.
+
+add the new file <b>categories-preview.components</b>
+
+And what we need to do now is we need to modify this.So instead of importing from shop, this is now categories-preview And this component will now be categories preview.
+
+> categories-preview.components
+```
+import { useContext, Fragment } from 'react';
+
+import { CategoriesContext } from '../../contexts/categories.context';
+import CategoryPreview from '../../components/category-preview/category-preview.component';
+
+const CategoriesPreview = () => {
+  const { categoriesMap } = useContext(CategoriesContext);
+
+  return (
+    <Fragment>
+      {Object.keys(categoriesMap).map((title) => {
+        const products = categoriesMap[title];
+        return (
+          <CategoryPreview key={title} title={title} products={products} />
+        );
+      })}
+    </Fragment>
+  );
+};
+
+export default CategoriesPreview;
+```
+
+We still need the categories map because all of this functionality is still going to stay the same.
+
+Except the only difference here is that instead of category preview container should be the name instead,of shop container.
+
+So everything else though is the exact same.
+
+We actually already had this component fully finished.
+
+> shop.component.jsx
+
+```
+import { Routes, Route } from 'react-router-dom';
+
+import CategoriesPreview from '../categories-preview/categories-preview.component';
+import Category from '../category/category.component';
+
+import './shop.styles.scss';
+
+const Shop = () => {
+  return (
+    <Routes>
+      <Route index element={<CategoriesPreview />} />
+      <Route path=':category' element={<Category />} />
+    </Routes>
+  );
+};
+
+export default Shop;
+```
+And let's bring this category's preview now into our shop component.
+Now, what it primarily needs is nested routing.
+So this means that we need to import in routes and routes.
+
+The reason why is because you cannot use a route component unless its immediate parent is a route component
+
+```
+<Route index element={<CategoriesPreview />} />
+```
+Now what we're saying is that, hey, if you match shop, slash any wild card of whatever you are,
+parameters that follow render the shop because inside of the shop you can expect further routes.
+And these routes are all going to be relative to the parent route, which was shop/, whatever
+is rendered inside as the parameter will be dealt with inside of this route.
+So this is the benefit of nesting the code like so.
+
+
+And this is true for any subsequent children routes that get nested, they're going to follow a similar
+pattern.Right now we just have an index route, but in the next component, we're going to do a dynamic URL
+parameter based route.
+```
+<Route index element={<CategoriesPreview />} />
+```
+
+#### Category Page
