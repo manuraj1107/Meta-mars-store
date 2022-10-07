@@ -2815,3 +2815,174 @@ useEffect(() => {
 
 Once its uploaded to firestore remove the useEffect we dont need it anymore even remove the SHOP_DATA
 except th method
+
+
+### Get Products and Categories from Firestore
+
+Now we already saved our data, now its time to fetch it and make use of it
+
+Let's create another method to get the categories
+ <b>getCategoriesAndDocuments</b>
+
+Now inside, what we need to do is we need first the collection reference. So just like we got it before I'm going to say collection reference is equal to collection passing at the DB, but also the collection key.
+
+ ```
+ export const getCategoriesAndDocuments = async() =>{
+    const collectionRef = collection(db,'categories');
+  }
+
+ ```
+Here though we know exactly what the collection key is.
+
+It's the categories key because we just made this collection.
+What we need is we need to generate a query and from that query we need to get docs.
+
+So we need to import two new methods from Firestore <b>Query</b> and <b>getDocs</b>
+
+```
+import {getFirestore, doc, getDoc, setDoc, collection, writeBatch, query, getDocs} from 'firebase/firestore'
+```
+But what we need to do with the query is we need to say, Hey, I'm going to generate a query off of
+
+this <b>collectionRef</b>
+
+So I'm going to use the query method by passing in the collectionRef.
+
+```
+const q = query(collectionRef);
+```
+
+This gives me some object now that I can get a snapshot from.
+So I'm going to say query snapshot is equal to a weight of calling Get docs on Q So getDocs.
+Here is the asynchronous ability to fetch those document snapshots that we want because now it's all
+encapsulated under this query snapshot.
+```
+const querySnapshot = await getDocs(q);
+```
+
+From here, we're actually able to access the different document snapshots off of query snapshot docs.
+This will give us an array of all of those individual documents inside, and the snapshots are the actual
+data themselves, as we've seen before when we use snapshots.
+
+But here what we want to do is we want to reduce over this to create this structure we've been discussing.
+So here I'm going to say concept category map,
+we're reducing over this array in order to finally end up with an object.
+```
+const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
+      const {title, items} = docSnapshot.data();
+      acc[title.toLowerCase()] = items;
+      return acc;
+    }, {});
+
+```
+So here for the actual structure of my reduce, my first argument of course, is the callback that gets
+invoked on each document snapshot.
+And then this is the final object we want to create. But this is the initial instance of it, which is an empty object because we're building out the map as we go.
+
+The first argument is going to be accumulator(acc).
+
+The second argument is going to be docSnapshot.
+
+And then from here, what we're going to do is we are going to first need to structure off the values
+of the data of this doc snapshot.
+
+So I want the title and I want the items and I'm going to say, hey, take this doc snapshot, give
+me the data, which will be the object, and then take off the title and the items.
+
+Then what I'm going to do is I'm going to say the accumulator at the title value is also need to be
+lowercase.
+
+```
+const {title, items} = docSnapshot.data();
+      acc[title.toLowerCase()] = items;
+```
+
+If we remember our title is actually, as I mentioned, uppercase.
+This value is going to be equal to the items and then I return my accumulator now that it's been updated.
+So now what this will be is the actual category map that we've been building out And I'm just going to return this as is.
+
+this is async and then we need to reduce over and yet somehow here on the docs we get like these documents snapshots.
+
+> products.context.jsx Import this method
+
+```
+import { getCategoriesAndDocuments } from '../utils/firebase/firebase.utils.js';
+useEffect(() => {
+    const getCategoriesMap = async () => {
+      const categoryMap = await getCategoriesAndDocuments();
+      console.log(categoryMap)
+    };
+
+    getCategoriesMap()
+  }, [])
+```
+
+
+Change the file name 'products.context.jsx' to 'categories.context.jsx'
+
+Also Change some code inside of it
+
+> categories.context.jsx
+
+```
+import { createContext, useState, useEffect } from 'react';
+
+import { getCategoriesAndDocuments } from '../utils/firebase/firebase.utils';
+
+export const CategoriesContext = createContext({
+  categoriesMap: {},
+});
+
+export const CategoriesProvider = ({ children }) => {
+  const [categoriesMap, setCategoriesMap] = useState({});
+
+  useEffect(() => {
+    const getCategoriesMap = async () => {
+      const categoryMap = await getCategoriesAndDocuments('categories');
+      setCategoriesMap(categoryMap);
+    };
+
+    getCategoriesMap();
+  }, []);
+
+  const value = { categoriesMap };
+  return (
+    <CategoriesContext.Provider value={value}>
+      {children}
+    </CategoriesContext.Provider>
+  );
+};
+```
+
+> shop.component.jsx
+
+```
+import { useContext, Fragment } from 'react';
+
+import ProductCard from '../../components/product-card/product-card.component';
+
+import { CategoriesContext } from '../../contexts/categories.context';
+
+import './shop.styles.scss';
+
+const Shop = () => {
+  const { categoriesMap } = useContext(CategoriesContext);
+
+  return (
+    <Fragment>
+      {Object.keys(categoriesMap).map((title) => (
+        <Fragment key={title}>
+          <h2>{title}</h2>
+          <div className='products-container'>
+            {categoriesMap[title].map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </Fragment>
+      ))}
+    </Fragment>
+  );
+};
+
+export default Shop;
+```
