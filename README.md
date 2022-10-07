@@ -2986,3 +2986,86 @@ const Shop = () => {
 
 export default Shop;
 ```
+
+Now as you can see we can see every product of the categories but what if we want to the page should preview the first four categories or only show minimum preview
+
+for that lets build a new component
+create new folder <b>category-preview</b>
+inside of it add two more files
+create new file named <b>category-preview.components.jsx</b>
+create new style file <b>category-preview.styles.jsx</b>
+
+> category-preview.components.jsx
+
+```
+import ProductCard from '../product-card/product-card.component';
+
+import './category-preview.styles.scss';
+
+const CategoryPreview = ({ title, products }) => (
+  <div className='category-preview-container'>
+    <h2>
+      <span className='title'>{title.toUpperCase()}</span>
+    </h2>
+    <div className='preview'>
+      {products
+        .filter((_, idx) => idx < 4)
+        .map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+    </div>
+  </div>
+);
+
+export default CategoryPreview;
+```
+
+> category-preview.styles.jsx
+
+```
+.category-preview-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 30px;
+  
+    .title {
+      font-size: 28px;
+      margin-bottom: 25px;
+      cursor: pointer;
+    }
+  
+    .preview {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      column-gap: 20px;
+    }
+  }
+```
+
+also change the shop.component.jsx and import the category-preview
+
+> shop.component.jsx
+```
+import { useContext } from 'react';
+
+import CategoryPreview from '../../components/category-preview/category-preview.component';
+
+import { CategoriesContext } from '../../contexts/categories.context';
+
+import './shop.styles.scss';
+
+const Shop = () => {
+  const { categoriesMap } = useContext(CategoriesContext);
+
+  return (
+    <div className='shop-container'>
+      {Object.keys(categoriesMap).map((key) => {
+        const products = categoriesMap[key];
+        return <CategoryPreview key={key} title={key} products={products} />;
+      })}
+    </div>
+  );
+};
+
+export default Shop;
+```
