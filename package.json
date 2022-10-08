@@ -16,6 +16,7 @@
     "react-icons": "^4.4.0",
     "react-router-dom": "^6.4.0",
     "sass": "^1.54.9",
+    "styled-components": "^5.3.6",
     "vite-svg-loader": "^3.6.0"
   },
   "devDependencies": {
