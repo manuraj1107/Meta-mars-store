@@ -3183,3 +3183,327 @@ parameter based route.
 ```
 
 #### Category Page
+
+
+
+
+### Styled Component
+
+> npm i styled-components
+
+Today I learnt styled component, and guess what happens I found my answers about the questions arises from the the curious observations I had few months ago, Let me share it with you
+
+If you are web developer, a beginner in it who tried to build a website, or even a non-tech guy , I'm sure you once visited any webapp like facebook,wikipedia, google or youtube and even clicked on the 'Inspect' button
+
+but as a front-end developer, you mostly use inspect for DevTools or CSS styling and then you observed that the classNames of the HTML element are pretty weird f1wDDf or RRg9R8 , you must be thinking damn professional developers name their classname like this but why they do it and how I can do it.
+
+Here is the answer with the help of Styled Component and the reason to do it is to get rid of style classing or css class-clashing
+
+
+convert navigation.styled.scss to navigation.styles.jsx
+
+> navigation.styles.jsx
+```
+import styled from "styled-components";
+import { Link } from 'react-router-dom';
+
+
+export const NavigationContainer =styled.div`
+    height: 70px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+
+`;
+
+export const LogoContainer = styled(Link)`
+height: 100%;
+      width: 70px;
+      padding: 25px;
+
+`;
+
+export const NavLinks = styled.div`
+      width: 50%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+`;
+
+export const NavLink = styled(Link)`
+       padding: 10px 15px;
+        cursor: pointer;
+
+`;
+
+
+
+```
+
+> navigation.component.jsx
+
+```
+import { Fragment, useContext } from 'react';
+import {Outlet, Link } from 'react-router-dom';
+import { CartContext } from '../../contexts/cart.context';
+import CartIcon from '../../components/cart-icon/cart-icon.component';
+import CartDropdown from '../../components/cart-dropdown/cart-dropdown.component';
+import { UserContext } from '../../contexts/user.context';
+import { signOutUser } from '../../utils/firebase/firebase.utils';
+import { NavigationContainer, LogoContainer, NavLinks, NavLink } from './navigation.styles';
+
+
+const Navigation = () => {
+  const {currentUser} = useContext(UserContext);
+  const { isCartOpen } = useContext(CartContext);
+
+  const signOutHandler = async () => {
+    await signOutUser();
+    setCurrentUser(null)
+  }
+
+
+
+
+  return(
+    <Fragment>
+      <NavigationContainer>
+      <LogoContainer to='/'>
+        <p className='logo'>Logo</p> 
+        </LogoContainer>
+        <NavLinks>
+         <NavLink to='/shop'>
+            SHOP
+         </NavLink>
+         {currentUser ? (
+            <NavLink as='span' onClick={signOutHandler}>
+              {' '}
+              SIGN OUT{' '}
+            </NavLink>
+          ) : (
+            <NavLink to='/auth'>
+              SIGN IN
+            </NavLink>
+          )}
+          <CartIcon />
+        </NavLinks>
+        {isCartOpen && <CartDropdown />}
+      </NavigationContainer>
+      <Outlet />
+    </Fragment>
+  )
+}
+
+export default Navigation;
+```
+
+
+### Button Styled-components
+
+> button.styles.jsx
+```
+import styled from 'styled-components';
+
+export const BaseButton = styled.button`
+min-width: 165px;
+    width: auto;
+    height: 50px;
+    letter-spacing: 0.5px;
+    line-height: 50px;
+    padding: 0 35px 0 35px;
+    font-size: 15px;
+    background-color: black;
+    color: white;
+    text-transform: uppercase;
+    font-weight: bolder;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+  
+    &:hover {
+      background-color: white;
+      color: black;
+      border: 1px solid black;
+    }
+`;
+
+export const GoogleSignInButton = styled(BaseButton)`
+      background-color: #4285f4;
+      color: white;
+  
+      &:hover {
+        background-color: #357ae8;
+        border: none;
+      }
+`;
+
+export const InvertedButton = styled(BaseButton)`
+      background-color: white;
+      color: black;
+      border: 1px solid black;
+  
+      &:hover {
+        background-color: black;
+        color: white;
+        border: none;
+      }
+`;
+
+
+```
+
+> button.components.jsx
+
+```
+import {BaseButton, GoogleSignInButton, InvertedButton} from './button.styles'
+
+export const BUTTON_TYPE_CLASSES = {
+    base: 'base',
+    google: 'google-sign-in',
+    inverted: 'inverted'
+};
+
+const getButton = (buttonType = BUTTON_TYPE_CLASSES.base) => (
+    {
+      [BUTTON_TYPE_CLASSES.base]: BaseButton,
+      [BUTTON_TYPE_CLASSES.google]: GoogleSignInButton,
+      [BUTTON_TYPE_CLASSES.inverted]: InvertedButton,
+
+    }[buttonType]
+)
+
+
+const Button = ({children, buttonType, ...otherProps}) => {
+    const CustomButton = getButton(buttonType);
+    return (
+        <CustomButton {...otherProps}>{children}</CustomButton>
+    )
+}
+
+export default Button;
+```
+
+> sign-in-form.components.jsx
+
+```
+import { useState } from 'react';
+
+import FormInput from '../form-input/form-input.component';
+import Button, {BUTTON_TYPE_CLASSES} from '../button/button.component';
+
+import {
+  signInAuthUserWithEmailAndPassword,
+  signInWithGooglePopup,
+  createUserDocumentFromAuth,
+} from '../../utils/firebase/firebase.utils';
+
+import './sign-in-form.styles.scss';
+
+const defaultFormFields = {
+  email: '',
+  password: '',
+};
+
+const SignInForm = () => {
+  const [formFields, setFormFields] = useState(defaultFormFields);
+  const { email, password } = formFields;
+
+  const resetFormFields = () => {
+    setFormFields(defaultFormFields);
+  };
+
+  const signInWithGoogle = async () => {
+    await signInWithGooglePopup();
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      await signInAuthUserWithEmailAndPassword(email, password);
+      resetFormFields();
+    } catch (error) {
+      console.log('user sign in failed', error);
+    }
+  };
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setFormFields({ ...formFields, [name]: value });
+  };
+
+  return (
+    <div className='sign-in-container'>
+      <h2>Already have an account?</h2>
+      <span>Sign in with your email and password</span>
+      <form onSubmit={handleSubmit}>
+        <FormInput
+          label='Email'
+          type='email'
+          required
+          onChange={handleChange}
+          name='email'
+          value={email}
+        />
+
+        <FormInput
+          label='Password'
+          type='password'
+          required
+          onChange={handleChange}
+          name='password'
+          value={password}
+        />
+        <div className='buttons-container'>
+          <Button type='submit'>Sign In</Button>
+          <Button buttonType={BUTTON_TYPE_CLASSES.google} type='button' onClick={signInWithGoogle}>
+            Sign In With Google
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default SignInForm;
+```
+
+> product-card.components.jsx
+
+```
+import { useContext } from 'react';
+
+import { CartContext } from '../../contexts/cart.context';
+
+import Button, {BUTTON_TYPE_CLASSES} from '../button/button.component';
+
+import './product-card.styles.scss';
+
+const ProductCard = ({ product }) => {
+  const { name, price, imageUrl } = product;
+  const { addItemToCart } = useContext(CartContext);
+
+  const addProductToCart = () => {
+    addItemToCart(product)
+  };
+
+  return (
+    <div className='product-card-container'>
+      <img src={imageUrl} alt={`${name}`} />
+      <div className='footer'>
+        <span className='name'>{name}</span>
+        <span className='price'>${price}</span>
+      </div>
+      <Button buttonType={BUTTON_TYPE_CLASSES.inverted} onClick={addProductToCart}>
+        Add to card
+      </Button>
+    </div>
+  );
+};
+
+export default ProductCard;
+```
