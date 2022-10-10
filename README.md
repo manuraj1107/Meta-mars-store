@@ -3587,3 +3587,69 @@ const CartDropdown = () => {
 
 export default CartDropdown;
 ```
+
+### Cart-Icon styled component
+
+> cart-icon.styles.jsx
+
+```
+import styled from 'styled-components';
+
+
+export const CartIconContainer = styled.div`
+    width: 45px;
+    height: 45px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+`;
+
+export const ShoppingIcon = styled.svg`
+      width: 24px;
+      height: 24px;
+`;
+
+
+export const ItemCount = styled.span`
+      position: absolute;
+      font-size: 10px;
+      font-weight: bold;
+      bottom: 12px;
+      color: red;
+
+`
+```
+
+> cart-icon.component.jsx
+
+```
+import { useContext } from 'react';
+
+
+import { CartContext } from '../../contexts/cart.context';
+
+import {ShoppingIcon, CartIconContainer, ItemCount} from './cart-icon.styles';
+
+const CartIcon = () => {
+  const { isCartOpen, setIsCartOpen, cartCount } = useContext(CartContext);
+
+  const toggleIsCartOpen = () => setIsCartOpen(!isCartOpen);
+
+  return (
+    <CartIconContainer onClick={toggleIsCartOpen}>
+        <ShoppingIcon className='shopping-icon'>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+</svg>
+      </ShoppingIcon>
+      <cartCount>{cartCount}</cartCount>
+      
+    </CartIconContainer>
+  );
+};
+
+export default CartIcon;
+```
