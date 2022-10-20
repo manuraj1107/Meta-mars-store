@@ -4057,3 +4057,78 @@ export const CartProvider = ({ children }) => {
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
 ```
+
+### Lets optimise here
+
+One thing we notice is that every time we have to generate this object,
+```
+{ type: CART_ACTION_TYPES.SET_IS_CART_OPEN, payload: bool }
+```
+
+what we can do:
+<b>Create an  helper function</b>
+
+Inside our <b>utils</b> folder, create a new folder called <b>reducer</b>
+and inside create a new file <b>reducer.utils.js</b>
+
+> reducer.utils.js
+
+```
+export const createAction = (type, payload) => ({type, payload});
+```
+
+now import <b>createAction</b> inside of our cartContext
+
+We will use this <b>createAction</b> to the places where there is <b>dispatch</b>
+
+from this:
+```
+dispatch({ 
+      type: CART_ACTION_TYPES.SET_CART_ITEMS, 
+      payload: { 
+        cartItems: newCartItems, 
+        cartTotal: newCartTotal, 
+        cartCount: newCartCount,
+       },
+       });
+
+```
+
+to this:
+
+```
+dispatch(
+      createAction(CART_ACTION_TYPES.SET_CART_ITEMS, { 
+        cartItems: newCartItems, 
+        cartTotal: newCartTotal, 
+        cartCount: newCartCount,
+       })
+      );
+```
+
+same for the other
+
+from this:
+
+```
+ dispatch(
+      { type: CART_ACTION_TYPES.SET_IS_CART_OPEN, payload: bool });
+
+```
+
+to this:
+```
+ dispatch(
+      createAction(CART_ACTION_TYPES.SET_IS_CART_OPEN, bool)
+    );
+```
+
+Apply same thing for <b>user.context</b>
+
+> user.context.jsx
+
+```
+dispatch(
+      createAction(USER_ACTION_TYPES.SET_CURRENT_USER, user)
+      );
+```
