@@ -4355,3 +4355,36 @@ export const UserProvider = ({ children }) => {
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 ```
+
+
+### Installing Redux
+
+> npm install redux react-redux redux-logger
+
+
+<b>Note- most of the time you do not want to use Context API and redux at the same time, the reason is because what userContext stores can be stored by Redux too</b>
+
+#### Some pre steps for boilerplate
+
+1. Create a new folder named <b>store</b> inside your src folder
+   this <b>store</b> is going to contain all of our redux code
+
+2. Inside of our folder <b>store</b> we need to create a new file
+  called <b>store.js</b>
+  this <b>store.js</b> is almost the combined place where all of our redux happens.
+
+  This is where our all <b>states</b> live, but also where we recieve <b>actions</b> and
+  we <b>dispatch</b> them into our reducers to update the state
+
+  Inside the store file we are going to generate the store object that we will use inside of our
+  React application in order to do this.
+
+3.  we need to import three different methods redux and logger from redux-logger
+
+> store.js
+
+  ```
+import { compose, createStore, applyMiddleware } from "redux";
+import logger from "redux-logger";
+  ```
+
