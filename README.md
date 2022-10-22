@@ -4388,3 +4388,78 @@ import { compose, createStore, applyMiddleware } from "redux";
 import logger from "redux-logger";
   ```
 
+In redux every component has ist own reducers
+
+We need <b>root reducer</b> which is the combination of all our reducers.
+Now in order to create our <b>root reducer</b> we are going to create a new filefor this reducer that is <b>root-reducer.js</b>
+
+
+4. Import the <b>combineReducers</b> inside root-reducer.js
+
+```
+import { combineReducers } from "redux";
+
+```
+<b>combineReducers</b> is just a method that allows us to create a final big reducer that we can use inside of our store by combining smaller reducers together.
+
+```
+import { combineReducers } from "redux";
+
+export const rootReducer = combineReducers({});
+```
+it's really just something that looks like an object to do it we're going to export <b>rootReducer</b> which is equal to combinedReducers.
+
+then we're going to pass into this parameter of <b>combinedReducer</b> is an object where the keys and the values are going to be the name of the reducer slice and then the actual reducer function itself.
+
+5. Create another folder named <b>user</b> inside our store folder
+ and create a new file named <b>user.reducer.js</b>
+
+ Now this userReducer is literaly going to be our <b>reducer</b>
+
+ Inside of it paste some code from <b>user.context.jsx</b> with some change
+
+> user.reducer.js
+ ```
+export const USER_ACTION_TYPES = {
+    SET_CURRENT_USER: 'SET_CURRENT_USER',
+  }
+  
+  const INITIAL_STATE = {
+    currentUser: null,
+  }
+  
+  export const userReducer = (state = INITIAL_STATE, action) => {
+    const {type, payload} = action;
+  
+    switch(type) {
+      case USER_ACTION_TYPES.SET_CURRENT_USER:
+        return {
+          ...state,
+          currentUser: payload,
+        };
+        default:
+          return state;
+    }
+  };
+ ```
+
+> this time state is gonna me INITIAL_VALUE
+
+> and by default we return state rather than type error
+
+6. Import this userReducer inside <b>root.reducer.js</b> 
+
+```
+import { combineReducers } from "redux";
+import { userReducer } from "./user/user.reducer";
+
+export const rootReducer = combineReducers({
+    user: userReducer,
+});
+
+
+```
+inside combineReducer pass the value(userReducer) to the key(user)
+Throught the Key thing actions pass to every single reducer.
+
+So that means that every single reducer by default needs to return the previous state if none of the cases match to the type.
