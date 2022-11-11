@@ -4388,14 +4388,15 @@ import { compose, createStore, applyMiddleware } from "redux";
 import logger from "redux-logger";
   ```
 
-In redux every component has ist own reducers
+In redux every component has its own reducers
 
 We need <b>root reducer</b> which is the combination of all our reducers.
-Now in order to create our <b>root reducer</b> we are going to create a new filefor this reducer that is <b>root-reducer.js</b>
+Now in order to create our <b>root reducer</b> we are going to create a new file for this reducer that is <b>root-reducer.js</b>
 
 
 4. Import the <b>combineReducers</b> inside root-reducer.js
 
+> root-reducer.js
 ```
 import { combineReducers } from "redux";
 
@@ -4443,7 +4444,7 @@ export const USER_ACTION_TYPES = {
   };
  ```
 
-> this time state is gonna me INITIAL_VALUE
+> this time state is gonna be INITIAL_VALUE
 
 > and by default we return state rather than type error
 
@@ -4463,3 +4464,102 @@ inside combineReducer pass the value(userReducer) to the key(user)
 Throught the Key thing actions pass to every single reducer.
 
 So that means that every single reducer by default needs to return the previous state if none of the cases match to the type.
+
+
+#### Setting up our Redux store
+
+1. we gonna import root-reducer inside of our <b>store.js</b>
+```
+import { rootReducer } from "./root-reducer";
+```
+
+2. Next up we want to know to fundamentaly create the store
+
+```
+export const store = createStore();
+```
+
+This <b>createStore()</b> will take three arguments.
+
+first is the only one which is necessary, <b>rootReducer</b>, well you need it in order to generate the store
+
+```
+export const store = createStore(rootReducer);
+```
+
+> all the reducers are pure function which recieves the state and action and in return they return you back some object that represent values in state.
+
+
+this store in just order to facilitate the movement and passing of action through these reducers, so all a store really need is just a root a reducer to be created
+
+2. But In order to make it useful we also want it to pass <b>logger</b>
+
+<i>This logger is essentially allows us to see what the states look like before it actually dispatched and how state in turn will look after the action.</i>
+
+In order to do that we will use <b>middleware</b>,
+
+> <b>middleware</b> are kind of library helpers that run before the action hits the reducer.
+
+So whenever we dispatch an action, before that action hits the reducer it hits the middleware first
+we will put logger in middleware
+and pass the <b>middleWares</b> as a second argument <b>createStore</b> also you can add more in third argument but for now lets just give it <b>undefined</b>
+
+```
+import { compose, createStore, applyMiddleware } from "redux";
+import logger from "redux-logger";
+
+import { rootReducer } from "./root-reducer";
+
+const middleWares = [logger]
+
+
+export const store = createStore(rootReducer, undefined, middleWares);
+```
+
+3. these middlewares are like enhancers, in order for it to work, you have to generate it
+using <b>Compose</b>
+
+```
+const composedEnhancers = compose(applyMiddleware(...middleWares));
+export const store = createStore(rootReducer, undefined, composedEnhancers);
+```
+
+
+4. In <b>index.js</b> import <b>Provider</b> from redux and as we know contain its variable globally,
+ so we will wrap whole BrowserRouter inside  <b>Provider</b>
+
+ also we will import store from store.js and pass it as a value to the store prop inside Provider
+
+ ```
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import {BrowserRouter} from 'react-router-dom'
+import { Provider } from 'react-redux'
+import App from './App'
+import { UserProvider } from './contexts/user.context'
+import { CategoriesProvider } from './contexts/categories.context'
+import { CartProvider } from './contexts/cart.context'
+import { store } from './store/store'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+  <Provider store={store}>
+    <BrowserRouter>
+      <UserProvider>
+       <CategoriesProvider>
+         <CartProvider>
+           <App />
+         </CartProvider>
+       </CategoriesProvider>  
+      </UserProvider>
+    </BrowserRouter>
+  </Provider>  
+  </React.StrictMode>
+)
+
+ ```
+
+
+ #### Creating User Reducer with redux
+
+ 
